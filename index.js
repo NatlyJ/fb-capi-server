@@ -2,10 +2,12 @@ require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const crypto = require('crypto');
-const app = express();
+const cors = require('cors'); // <--- ДОБАВЛЕНО
 
+const app = express();
 const PORT = process.env.PORT || 3000;
 
+app.use(cors()); // <--- ДОБАВЛЕНО: разрешаем CORS
 app.use(express.json());
 
 function hashData(data) {
@@ -21,11 +23,11 @@ app.post('/fb-event', async (req, res) => {
     event_id,
     action_source: 'website',
     user_data: {
-      em: hashData(email)
+      em: email ? hashData(email) : undefined,
     },
     custom_data: {
       value,
-      currency
+      currency,
     }
   };
 
