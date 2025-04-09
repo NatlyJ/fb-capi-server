@@ -2,12 +2,12 @@ require('dotenv').config();
 const express = require('express');
 const axios = require('axios');
 const crypto = require('crypto');
-const cors = require('cors');
+const cors = require('cors'); // <--- ДОБАВЛЕНО
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors()); // <--- ДОБАВЛЕНО: разрешаем CORS
 app.use(express.json());
 
 function hashData(data) {
@@ -17,21 +17,17 @@ function hashData(data) {
 app.post('/fb-event', async (req, res) => {
   const { event_name, event_id, email, value, currency } = req.body;
 
-  if (!event_name || !email) {
-    return res.status(400).json({ error: "Missing required fields: event_name or email" });
-  }
-
   const payload = {
     event_name,
     event_time: Math.floor(Date.now() / 1000),
-    event_id: event_id || `evt_${Date.now()}`,
+    event_id,
     action_source: 'website',
     user_data: {
-      em: email ? hashData(email) : undefined
+      em: email ? hashData(email) : undefined,
     },
     custom_data: {
-      value: value || 0,
-      currency: currency || 'EUR'
+      value,
+      currency,
     }
   };
 
@@ -43,12 +39,8 @@ app.post('/fb-event', async (req, res) => {
 
     res.json({ success: true, fb_response: response.data });
   } catch (error) {
-    console.error("FB ERROR RESPONSE:", error.response?.data || error.message);
-    res.status(500).json({ 
-      success: false, 
-      error: error.message,
-      fb_error: error.response?.data
-    });
+    console.error(error.response?.data || error.message);
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
