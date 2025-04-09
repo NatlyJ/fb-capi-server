@@ -24,6 +24,8 @@ app.post('/fb-event', async (req, res) => {
     action_source: 'website',
     user_data: {
       em: email ? hashData(email) : undefined,
+      client_user_agent: req.headers['user-agent'],
+  client_ip_address: req.ip
     },
     custom_data: {
       value,
