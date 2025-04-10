@@ -15,15 +15,7 @@ function hashData(data) {
 }
 
 app.post('/fb-event', async (req, res) => {
-  const {
-    event_name,
-    event_id,
-    email,
-    first_name,
-    phone,
-    browser_language,
-    user_agent
-  } = req.body;
+  const { event_name, event_id, email, first_name, phone } = req.body;
 
   const payload = {
     event_name,
@@ -34,9 +26,8 @@ app.post('/fb-event', async (req, res) => {
       em: email ? hashData(email) : undefined,
       fn: first_name ? hashData(first_name) : undefined,
       ph: phone ? hashData(phone) : undefined,
-      client_user_agent: user_agent,
-      client_ip_address: req.ip,
-      browser_language: browser_language
+      client_user_agent: req.headers['user-agent'],
+      client_ip_address: req.ip
     }
   };
 
