@@ -19,11 +19,10 @@ app.post('/fb-event', async (req, res) => {
     event_name,
     event_id,
     email,
-    value,
-    currency,
-    fbp,
-    fbc,
-    test_event_code
+    first_name,
+    phone,
+    browser_language,
+    user_agent
   } = req.body;
 
   const payload = {
@@ -33,31 +32,20 @@ app.post('/fb-event', async (req, res) => {
     action_source: 'website',
     user_data: {
       em: email ? hashData(email) : undefined,
-      client_user_agent: req.headers['user-agent'],
+      fn: first_name ? hashData(first_name) : undefined,
+      ph: phone ? hashData(phone) : undefined,
+      client_user_agent: user_agent,
       client_ip_address: req.ip,
-      fbp: fbp || undefined,
-      fbc: fbc || undefined
-    },
-    custom_data: {
-      value: value || undefined,
-      currency: currency || undefined
+      browser_language: browser_language
     }
   };
 
-  const fbRequest = {
-    data: [payload],
-    access_token: process.env.FB_ACCESS_TOKEN
-  };
-
-  if (test_event_code) {
-    fbRequest.test_event_code = test_event_code;
-  }
-
   try {
-    const response = await axios.post(
-      `https://graph.facebook.com/v18.0/${process.env.PIXEL_ID}/events`,
-      fbRequest
-    );
+    const response = await axios.post(`https://graph.facebook.com/v18.0/${process.env.PIXEL_ID}/events`, {
+      data: [payload],
+      access_token: process.env.FB_ACCESS_TOKEN
+    });
+
     res.json({ success: true, fb_response: response.data });
   } catch (error) {
     console.error(error.response?.data || error.message);
