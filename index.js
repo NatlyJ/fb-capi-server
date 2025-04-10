@@ -34,9 +34,8 @@ app.post('/fb-event', async (req, res) => {
   try {
     const response = await axios.post(`https://graph.facebook.com/v18.0/${process.env.PIXEL_ID}/events`, {
       data: [payload],
-      access_token: process.env.FB_ACCESS_TOKEN,
-      test_event_code: req.body.test_event_code
-    });
+      access_token: process.env.FB_ACCESS_TOKEN
+          });
 
     res.json({ success: true, fb_response: response.data });
   } catch (error) {
