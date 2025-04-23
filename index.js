@@ -44,6 +44,30 @@ app.post('/fb-event', async (req, res) => {
   }
 });
 
+// GA4 ENDPOINT
+app.post('/ga4-event', async (req, res) => {
+  const { client_id, event_name, params } = req.body;
+
+  const payload = {
+    client_id: client_id || crypto.randomUUID(),
+    events: [{
+      name: event_name,
+      params: params || {}
+    }]
+  };
+
+  try {
+    const response = await axios.post(
+      `https://www.google-analytics.com/mp/collect?measurement_id=${process.env.GA_MEASUREMENT_ID}&api_secret=${process.env.GA_API_SECRET}`,
+      payload
+    );
+    res.json({ success: true, ga_response: response.data });
+  } catch (error) {
+    console.error('GA4 Error:', error.response?.data || error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
